@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.env
+.git/
+.github/
+chroma_data/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+dist/
+*.egg-info/
+helm/
+terraform/
+docs/
+*.md
+!data/**/*.md

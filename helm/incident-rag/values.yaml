@@ -1,0 +1,63 @@
+replicaCount: 2
+
+image:
+  repository: incident-rag-engine
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: rag.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 2Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+env:
+  LLM_PROVIDER: openrouter
+  OPENROUTER_MODEL: google/gemini-2.5-flash:free
+  CHROMA_PERSIST_DIR: /data/chroma
+  CHROMA_COLLECTION: incidents
+  EMBEDDING_MODEL: all-MiniLM-L6-v2
+  INCIDENT_DATA_DIR: /data/incidents
+  LOG_LEVEL: INFO
+
+# Reference to a pre-created K8s Secret containing API keys
+# kubectl create secret generic rag-secrets --from-literal=OPENROUTER_API_KEY=sk-or-...
+secretName: rag-secrets
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+podAnnotations: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

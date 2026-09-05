@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - chroma_data:/app/chroma_data
+      - ./data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # One-shot container to ingest incident data on first run
+  ingest:
+    build: .
+    command: ["python", "-m", "src.cli.main", "ingest-cmd"]
+    env_file: .env
+    volumes:
+      - chroma_data:/app/chroma_data
+      - ./data:/app/data:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    profiles:
+      - setup
+
+volumes:
+  chroma_data:

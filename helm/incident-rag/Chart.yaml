@@ -1,0 +1,14 @@
+apiVersion: v2
+name: incident-rag-engine
+description: RAG-powered incident resolution engine for Cloud/K8s operations
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - rag
+  - incidents
+  - sre
+  - aiops
+maintainers:
+  - name: Your Name
+    url: https://github.com/<your-username>

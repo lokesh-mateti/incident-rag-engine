@@ -1,0 +1,17 @@
+Incident RAG Engine deployed successfully!
+
+1. Get the application URL:
+{{- if .Values.ingress.enabled }}
+  http{{ if .Values.ingress.tls }}s{{ end }}://{{ (index .Values.ingress.hosts 0).host }}
+{{- else }}
+  kubectl port-forward svc/{{ include "incident-rag.fullname" . }} 8000:{{ .Values.service.port }}
+  Then visit: http://localhost:8000/health
+{{- end }}
+
+2. Ingest incident data:
+  curl -X POST http://localhost:8000/ingest
+
+3. Query:
+  curl -X POST http://localhost:8000/query \
+    -H "Content-Type: application/json" \
+    -d '{"question": "pod CrashLoopBackOff in production"}'
