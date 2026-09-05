@@ -52,7 +52,7 @@ RAG-powered incident resolution engine for Cloud/Kubernetes operations. Ingests 
 ### Setup
 
 ```bash
-git clone https://github.com/<your-username>/incident-rag-engine.git
+git clone https://github.com/lokesh-mateti/incident-rag-engine.git
 cd incident-rag-engine
 
 python -m venv .venv && source .venv/bin/activate
@@ -109,10 +109,10 @@ Set `LLM_PROVIDER` in `.env`:
 
 | Provider | Env Var | Default Model | Cost |
 |----------|---------|---------------|------|
-| `openrouter` | `OPENROUTER_API_KEY` | `google/gemini-2.5-flash:free` | Free |
+| `openrouter` | `OPENROUTER_API_KEY` | `nvidia/nemotron-3.5-lightning:free` | Free |
 | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` | ~$0.002/query |
 
-OpenRouter free models (no credit card needed): `google/gemini-2.5-flash:free`, `meta-llama/llama-4-scout:free`, `deepseek/deepseek-chat-v3-0324:free`
+OpenRouter free models (no credit card needed): `nvidia/nemotron-3.5-lightning:free`, `meta-llama/llama-4-scout:free`, `deepseek/deepseek-chat-v3-0324:free`
 
 ---
 
@@ -174,7 +174,7 @@ Tests cover ingestion (loader, chunker, metadata extraction), vector store opera
 
 ## Roadmap
 
-- [ ] Helm chart for K8s deployment
+- [x] Helm chart for K8s deployment
 - [ ] Terraform module (ECS Fargate)
 - [ ] Slack bot integration
 - [ ] Streaming responses (SSE)
