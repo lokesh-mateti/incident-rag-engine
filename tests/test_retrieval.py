@@ -1,24 +1,22 @@
 """Tests for vector store operations and the RAG chain prompt."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 from langchain_core.documents import Document
 
 from src.retrieval.chain import QueryResult, _format_context, build_chain
-from src.retrieval.vectorstore import get_vectorstore, ingest, reset, search
+from src.retrieval.vectorstore import ingest, reset, search
 
 
 # ── Vector store tests ────────────────────────────────────────────────
-
-
 @pytest.fixture(autouse=True)
 def _isolate_chroma(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Point ChromaDB at a temp directory and reset singleton between tests."""
     monkeypatch.setattr("src.retrieval.vectorstore.settings.chroma_persist_dir", str(tmp_path))
     monkeypatch.setattr("src.retrieval.vectorstore.settings.chroma_collection", "test")
     import src.retrieval.vectorstore as vs
+
     vs._store = None
 
 
@@ -54,8 +52,6 @@ def test_reset_clears_data() -> None:
 
 
 # ── Chain / prompt tests ──────────────────────────────────────────────
-
-
 def test_format_context_includes_source() -> None:
     docs = _make_docs(2)
     ctx = _format_context(docs)
@@ -73,6 +69,7 @@ def test_build_chain_has_system_and_human() -> None:
 def test_query_returns_no_results_message() -> None:
     """When the vector store is empty, query should return a helpful message."""
     from src.retrieval.chain import query
+
     result = query("nonexistent problem")
     assert isinstance(result, QueryResult)
     assert "No relevant incidents" in result.answer

@@ -1,7 +1,6 @@
 """Tests for the FastAPI application."""
 
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -33,9 +32,13 @@ def test_ingest_endpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Non
         "id: INC-E2E\nseverity: SEV-2\nservice: test\n\n# Test\n\nBody text.\n"
     )
     monkeypatch.setattr("src.ingestion.loader.settings.incident_data_dir", str(tmp_path))
-    monkeypatch.setattr("src.retrieval.vectorstore.settings.chroma_persist_dir", str(tmp_path / "chroma"))
+    monkeypatch.setattr(
+        "src.retrieval.vectorstore.settings.chroma_persist_dir",
+        str(tmp_path / "chroma"),
+    )
     monkeypatch.setattr("src.retrieval.vectorstore.settings.chroma_collection", "test_api")
     import src.retrieval.vectorstore as vs
+
     vs._store = None
 
     resp = client.post("/ingest")
