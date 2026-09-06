@@ -1,12 +1,12 @@
 """Centralized configuration loaded from environment / .env file."""
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     OPENROUTER = "openrouter"
     ANTHROPIC = "anthropic"
 
