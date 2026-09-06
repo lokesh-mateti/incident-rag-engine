@@ -38,6 +38,7 @@ def test_ingest_endpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Non
     )
     monkeypatch.setattr("src.retrieval.vectorstore.settings.chroma_collection", "test_api")
     import src.retrieval.vectorstore as vs
+
     vs._store = None
 
     resp = client.post("/ingest")

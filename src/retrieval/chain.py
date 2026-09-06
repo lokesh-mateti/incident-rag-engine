@@ -94,9 +94,7 @@ def query(question: str, k: int = 5) -> QueryResult:
     """End-to-end RAG: retrieve chunks → build prompt → call LLM."""
     docs = search(question, k=k)
     if not docs:
-        return QueryResult(
-            answer="No relevant incidents found in the knowledge base."
-        )
+        return QueryResult(answer="No relevant incidents found in the knowledge base.")
 
     context = _format_context(docs)
     prompt = build_chain()
