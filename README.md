@@ -10,28 +10,55 @@ RAG-powered incident resolution engine for Cloud/Kubernetes operations. Ingests 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Incident RAG Engine                      │
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌───────────────────┐  │
-│  │  Markdown     │    │  Loader +    │    │   ChromaDB        │  │
-│  │  Incidents    │───▶│  Chunker     │───▶│   (Vector Store)  │  │
-│  │  data/        │    │              │    │                   │  │
-│  └──────────────┘    └──────────────┘    └────────┬──────────┘  │
-│                                                   │              │
-│  ┌──────────────┐    ┌──────────────┐    ┌────────▼──────────┐  │
-│  │  User Query   │    │  RAG Chain   │    │  HuggingFace      │  │
-│  │  (CLI / API)  │───▶│  (LangChain) │◀──▶│  Embeddings       │  │
-│  └──────────────┘    └───────┬──────┘    │  (all-MiniLM-L6)  │  │
-│                              │           └───────────────────┘  │
-│                     ┌────────▼────────┐                         │
-│                     │  LLM Provider   │                         │
-│                     │  ┌────────────┐ │                         │
-│                     │  │ OpenRouter │ │  ◀── default (free)     │
-│                     │  │ Anthropic  │ │  ◀── direct Claude API  │
-│                     │  └────────────┘ │                         │
-│                     └─────────────────┘                         │
-└─────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          Incident RAG Engine                               │
+│                                                                              │
+│  INGESTION PIPELINE (rag-cli ingest-cmd)                                   │
+│  ─────────────────────────────────────────                                 │
+│  ┌───────────────┐   ┌────────────────┐   ┌─────────────────┐             │
+│  │ data/incidents │   │ Loader         │   │ Chunker          │             │
+│  │ *.md files     │──▶│ + frontmatter  │──▶│ recursive split, │             │
+│  │ (8 incidents)  │   │ extraction     │   │ markdown-aware,  │             │
+│  │                │   │ (severity,     │   │ w/ overlap       │             │
+│  │                │   │  service, ...) │   │                  │             │
+│  └───────────────┘   └────────────────┘   └────────┬─────────┘             │
+│                                                     │                       │
+│                                                     ▼                       │
+│                                          ┌─────────────────────┐            │
+│                                          │ all-MiniLM-L6-v2    │            │
+│                                          │ (local, CPU, 384-d) │            │
+│                                          └──────────┬──────────┘            │
+│                                                     ▼                       │
+│                                          ┌─────────────────────┐            │
+│                                          │ ChromaDB             │            │
+│                                          │ vectors + metadata   │            │
+│                                          │ (42 chunks)           │            │
+│                                          └─────────────────────┘            │
+│                                                                              │
+│  QUERY PIPELINE (rag-cli ask / chat, or POST /query)                       │
+│  ────────────────────────────────────────────────────                      │
+│  ┌───────────────┐                       ┌─────────────────────┐           │
+│  │ User Query     │──── embed query ─────▶│ ChromaDB             │          │
+│  │ (CLI / API)    │                       │ cosine-similarity     │         │
+│  │                │                       │ top-k retrieval       │         │
+│  └───────────────┘                       └──────────┬──────────┘           │
+│                                                      │ retrieved chunks     │
+│                                                      ▼                      │
+│                                          ┌─────────────────────┐           │
+│                                          │ RAG Chain (LangChain)│           │
+│                                          │ assemble context +   │           │
+│                                          │ prompt template       │           │
+│                                          └──────────┬──────────┘           │
+│                                                      ▼                      │
+│                                          ┌─────────────────────┐           │
+│                                          │ LLM Provider          │          │
+│                                          │  OpenRouter (default, │          │
+│                                          │   free tier)           │         │
+│                                          │  Anthropic (direct)    │         │
+│                                          └──────────┬──────────┘           │
+│                                                      ▼                      │
+│                                          Grounded, cited answer             │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Data flow:**
