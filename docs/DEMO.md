@@ -1,4 +1,4 @@
-# Demo Guide — Incident Resolution RAG Engine
+# Demo — Incident Resolution RAG Engine
 
 A complete walkthrough to set up, run, and understand this project from scratch. No prior setup required.
 
