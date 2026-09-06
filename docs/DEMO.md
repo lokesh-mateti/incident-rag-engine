@@ -663,7 +663,7 @@ A: Embeddings are free (local model). The LLM call costs fractions of a cent per
 
 ---
 
-## 18. Suggested YouTube Video Flow
+## 18. Flow
 
 1. Hook — "Your incidents are your best runbook"
 2. Problem statement — why SRE teams need this
